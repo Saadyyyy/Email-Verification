@@ -1,43 +1,73 @@
 package config
 
 import (
-	"database/sql"
-	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
+	"github.com/sirupsen/logrus"
 )
 
-type DatabaseConfig struct {
-	Host     string
-	Port     string
-	Username string
-	Password string
-	DBName   string
+type AppConfig struct {
+	SERVERPORT int
+	DBPORT     int
+	DBHOST     string
+	DBUSERNAME string
+	DBPASSWORD string
+	DBNAME     string
 }
 
-func InitializeDatabase() (*sql.DB, error) {
+func InitConfig() *AppConfig {
+	var res = new(AppConfig)
+	res = loadConfig()
 
-	errE := godotenv.Load()
-	if errE != nil {
-		fmt.Println("Env can connect")
+	if res == nil {
+		logrus.Fatal("Config : Cannot start program, failed to load configuration")
+		return nil
 	}
 
-	dbConfig := DatabaseConfig{}
-	dbConfig.Host = os.Getenv("DBHOST")
-	dbConfig.Port = os.Getenv("DBPORT")
-	dbConfig.Username = os.Getenv("DBUSER")
-	dbConfig.DBName = os.Getenv("DBNAME")
-	dbConfig.Password = os.Getenv("DBPASS")
-	// Konfigurasi koneksi database MySQL dengan GORM
-	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		dbConfig.Host, dbConfig.Port, dbConfig.Username, dbConfig.Password, dbConfig.DBName)
-	db, err := sql.Open("postgres", dsn)
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println("Connect To Database")
+	return res
+}
+
+func loadConfig() *AppConfig {
+	var res = new(AppConfig)
+
+	godotenv.Load(".env")
+
+	if val, found := os.LookupEnv("SERVERPORT"); found {
+		port, err := strconv.Atoi(val)
+		if err != nil {
+			logrus.Error("Config : invalid port value,", err.Error())
+			return nil
+		}
+		res.SERVERPORT = port
 	}
 
-	return db, nil
+	if val, found := os.LookupEnv("DBPORT"); found {
+		port, err := strconv.Atoi(val)
+		if err != nil {
+			logrus.Error("Config : invalid db port value,", err.Error())
+			return nil
+		}
+		res.DBPORT = port
+	}
+
+	if val, found := os.LookupEnv("DBHOST"); found {
+		res.DBHOST = val
+	}
+
+	if val, found := os.LookupEnv("DBUSERNAME"); found {
+		res.DBUSERNAME = val
+	}
+
+	if val, found := os.LookupEnv("DBPASSWORD"); found {
+		res.DBPASSWORD = val
+	}
+
+	if val, found := os.LookupEnv("DBNAME"); found {
+		res.DBNAME = val
+	}
+
+	return res
+
 }
