@@ -5,6 +5,7 @@ import (
 
 	"email.v1/config"
 	"email.v1/database"
+	"email.v1/route"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -22,9 +23,7 @@ func main() {
 	database.DBMigration(db)
 
 	g.Use(cors.Default())
-
-	// Route
-	// <Route function disini >
+	route.RouteInit(g, db)
 
 	g.Run(fmt.Sprintf(":%d", cfg.SERVERPORT))
 }
