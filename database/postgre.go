@@ -29,4 +29,5 @@ func InitDBPostgres(cfg *config.AppConfig) *gorm.DB {
 func DBMigration(db *gorm.DB) {
 	db.AutoMigrate(models.Users{})
 	db.AutoMigrate(models.TokenVerif{})
+
 }

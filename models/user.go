@@ -10,9 +10,11 @@ import (
 type Users struct {
 	Id        string
 	Username  string
+	Email     string
 	Password  string
 	IsVerify  bool
 	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 type TokenVerif struct {
@@ -20,7 +22,6 @@ type TokenVerif struct {
 	UsersID   string
 	Token     string
 	Expire    int64
-	CreatedAt time.Time
 }
 
 func (u *Users) BeforeCreate(tx *gorm.DB) (err error) {
