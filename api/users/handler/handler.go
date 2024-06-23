@@ -4,14 +4,12 @@ import (
 	"net/http"
 	"strings"
 
-	"email.v1/api/dto"
-	"email.v1/api/service"
+	"email.v1/api/users/dto"
+	"email.v1/api/users/service"
 	"email.v1/utils/constanta"
 	"email.v1/utils/helper"
 	"github.com/gin-gonic/gin"
 )
-
-
 
 type handler struct {
 	service service.ServiceInterface
@@ -32,7 +30,7 @@ func (h *handler) CreateUser(c *gin.Context) {
 		return
 	}
 
-	err = h.service.CreateUser(schema)
+	err = h.service.Create(schema)
 	if err != nil {
 		if strings.Contains(err.Error(), constanta.ERROR) {
 			c.JSON(400, helper.ErrorResponse(err.Error()))
@@ -43,11 +41,5 @@ func (h *handler) CreateUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, helper.SuccessResponse("success create user"))
+	helper.SuccessReturn(c, http.StatusOK, "success create user")
 }
-
-
-
-
-
-

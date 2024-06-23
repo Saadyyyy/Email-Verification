@@ -15,13 +15,14 @@ type Users struct {
 	IsVerify  bool
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	DeletedAt time.Time
 }
 
 type TokenVerif struct {
-	Id        string
-	UsersID   string
-	Token     string
-	Expire    int64
+	Id      string
+	UsersID string
+	Token   string
+	Expire  int64
 }
 
 func (u *Users) BeforeCreate(tx *gorm.DB) (err error) {

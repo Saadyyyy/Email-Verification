@@ -1,5 +1,7 @@
 package helper
 
+import "github.com/gin-gonic/gin"
+
 type ErrorResponseJson struct {
 	Status  bool   `json:"status"`
 	Message string `json:"message"`
@@ -41,4 +43,8 @@ func SuccessWithPageResponse(message string, meta, data interface{}) SuccessResp
 		Meta:    meta,
 		Data:    data,
 	}
+}
+
+func SuccessReturn(c *gin.Context, status int, massage string) {
+	c.JSON(status, SuccessResponse(massage))
 }

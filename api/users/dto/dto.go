@@ -43,7 +43,6 @@ func ModelVerifTorResponse(data models.TokenVerif) ResponseToken {
 	}
 }
 
-
 // Mapping Request To Model
 func RequestUserToModel(data RequestUser) models.Users {
 	return models.Users{

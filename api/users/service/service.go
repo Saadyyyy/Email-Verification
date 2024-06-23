@@ -2,30 +2,36 @@ package service
 
 import (
 	"errors"
+	"fmt"
 
-	"email.v1/api/dto"
-	"email.v1/api/repository"
+	"email.v1/api/users/dto"
+	"email.v1/api/users/repository"
+	"email.v1/models"
 	"email.v1/utils/helper"
 	"email.v1/utils/validation"
+	"gorm.io/gorm"
 )
 
 type ServiceEmail struct {
+	db         *gorm.DB
 	repository repository.RepositoryInterface
 }
 
 // FindUser implements RepositoryInterface.
 type ServiceInterface interface {
-	CreateUser(input dto.RequestUser) error
+	Create(input dto.RequestUser) error
 	FindUserByEmail(email string) (dto.ResponseUser, error)
+	Login(input dto.RequestUser) error
 }
 
-func NewRepositoryEmail(repository repository.RepositoryInterface) ServiceInterface {
+func NewRepositoryEmail(repository repository.RepositoryInterface, db *gorm.DB) ServiceInterface {
 	return &ServiceEmail{
 		repository: repository,
+		db:         db,
 	}
 }
 
-func (s *ServiceEmail) CreateUser(input dto.RequestUser) error {
+func (s *ServiceEmail) Create(input dto.RequestUser) error {
 
 	errEmpty := validation.CheckEmpty(input.Email, input.Password, input.Username)
 	if errEmpty != nil {
@@ -37,17 +43,33 @@ func (s *ServiceEmail) CreateUser(input dto.RequestUser) error {
 		return errors.New("errors : email already exist")
 	}
 
+	if input.Username != "" {
+		err := s.db.Where("username = ?", input.Username).First(&models.Users{}).Error
+		if err == nil {
+			return errors.New("error: username already exists")
+		}
+	}
+
 	Encrypt, err := helper.HashPassword(input.Password)
 	if err != nil {
 		return errors.New("errors : failed to encrypt password")
 	}
 
 	input.Password = Encrypt
+	user := models.Users{}
 
-	err = s.repository.CreateUser(input)
+	if !user.IsVerify {
+		return fmt.Errorf("Harap register lebih dahulu")
+	}
+
+	err = s.repository.Create(input)
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (s *ServiceEmail) Login(input dto.RequestUser) error {
 	return nil
 }
 

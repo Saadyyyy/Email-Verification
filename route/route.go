@@ -1,18 +1,18 @@
 package route
 
 import (
-	"email.v1/api/handler"
-	"email.v1/api/repository"
-	"email.v1/api/service"
+	"email.v1/api/users/handler"
+	"email.v1/api/users/repository"
+	"email.v1/api/users/service"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
-func RouteInit(c *gin.Engine,  db *gorm.DB){
+func RouteInit(c *gin.Engine, db *gorm.DB) {
 	emailRepository := repository.NewRepositoryEmail(db)
-	emailService := service.NewRepositoryEmail(emailRepository)
+	emailService := service.NewRepositoryEmail(emailRepository, db)
 	emailHandler := handler.NewHandler(emailService)
 
-	c.POST( "/", emailHandler.CreateUser)
+	c.POST("/", emailHandler.CreateUser)
 	//c.GET("/token")
 }
