@@ -43,3 +43,25 @@ func (h *handler) CreateUser(c *gin.Context) {
 
 	helper.SuccessReturn(c, http.StatusOK, "success create user")
 }
+
+func (h *handler) Login(c *gin.Context) {
+	schema := dto.RequestUser{}
+
+	err := c.BindJSON(&schema)
+	if err != nil {
+		c.JSON(400, helper.ErrorResponse(err.Error()))
+		return
+	}
+
+	err2 := h.service.Login(schema)
+	if err2 != nil {
+		if strings.Contains(err2.Error(), constanta.ERROR) {
+			c.JSON(400, helper.ErrorResponse(err2.Error()))
+		}
+
+		c.JSON(500, helper.ErrorResponse(err2.Error()))
+	}
+
+	helper.SuccessReturn(c, http.StatusOK, "login berhasil")
+
+}

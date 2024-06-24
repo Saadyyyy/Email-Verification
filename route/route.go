@@ -13,6 +13,6 @@ func RouteInit(c *gin.Engine, db *gorm.DB) {
 	emailService := service.NewRepositoryEmail(emailRepository, db)
 	emailHandler := handler.NewHandler(emailService)
 
-	c.POST("/", emailHandler.CreateUser)
-	//c.GET("/token")
+	c.POST("register", emailHandler.CreateUser)
+	c.POST("/login", emailHandler.Login)
 }
